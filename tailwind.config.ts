@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -14,7 +15,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Outfit', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
@@ -70,6 +71,15 @@ export default {
         "epsilon-bg": "hsl(var(--epsilon-bg))",
         success: "hsl(var(--success))",
         info: "hsl(var(--info))",
+        dashboard: {
+          bg: "#F8FAFC", // Slate-50 (Off-white/Paper-like)
+          panel: "#FFFFFF", // Pure White Elevated Surface
+          card: "#FFFFFF", // Pure White
+          accent: "#8B5CF6", // Vibrant Purple (Keep same)
+          "accent-blue": "#3B82F6", // Electric Blue (Keep same)
+          text: "#0F172A", // Slate-900 (High Contrast Dark)
+          "text-muted": "#64748B", // Slate-500 (Neutral Gray)
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -92,5 +102,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 } satisfies Config;
