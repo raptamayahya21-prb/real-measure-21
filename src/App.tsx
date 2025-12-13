@@ -26,7 +26,7 @@ const App = () => (
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="measure" element={<Measure />} />
-              <Route path="Theory" element={<Teori />} />
+              <Route path="learning" element={<Teori />} />
               <Route path="challenge" element={<Challenge />} />
               <Route path="history" element={<History />} />
               <Route path="settings" element={<Settings />} />
