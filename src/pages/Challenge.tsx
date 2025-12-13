@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { QUESTIONS, Question } from '../data/questions';
-import { Trophy, RotateCcw, CheckCircle2, XCircle, ArrowLeft } from 'lucide-react';
+import { Trophy, RotateCcw, CheckCircle2, XCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,15 +36,15 @@ const Challenge = () => {
         if (optionIdx === challengeQuestions[currentQuestionIdx].correctAnswer) {
             setScore(prev => prev + 1);
         }
+    };
 
-        setTimeout(() => {
-            if (currentQuestionIdx < challengeQuestions.length - 1) {
-                setCurrentQuestionIdx(prev => prev + 1);
-                setSelectedAnswer(null);
-            } else {
-                setShowResult(true);
-            }
-        }, 1500);
+    const handleNext = () => {
+        if (currentQuestionIdx < challengeQuestions.length - 1) {
+            setCurrentQuestionIdx(prev => prev + 1);
+            setSelectedAnswer(null);
+        } else {
+            setShowResult(true);
+        }
     };
 
     const handleBack = () => {
@@ -81,7 +81,7 @@ const Challenge = () => {
                         exit={{ opacity: 0, x: -20 }}
                     >
                         {!showResult ? (
-                            <Card className="p-4 sm:p-6 md:p-8 shadow-2xl border-white/20">
+                            <Card className="p-4 sm:p-6 md:p-8 shadow-2xl border-white/20 overflow-hidden">
                                 <Button variant="ghost" onClick={() => setIsStarted(false)} className="mb-4 pl-0 hover:bg-transparent text-muted-foreground">
                                     <ArrowLeft className="w-4 h-4 mr-2" /> Keluar
                                 </Button>
@@ -92,8 +92,8 @@ const Challenge = () => {
                                 </div>
                                 <Progress value={((currentQuestionIdx) / challengeQuestions.length) * 100} className="mb-8 h-2" />
 
-                                <div className="mb-8 min-h-[100px]">
-                                    <h3 className="text-2xl font-bold leading-relaxed">{challengeQuestions[currentQuestionIdx]?.question}</h3>
+                                <div className="mb-8 min-h-[100px] overflow-hidden">
+                                    <h3 className="text-xl sm:text-2xl font-bold leading-relaxed break-words">{challengeQuestions[currentQuestionIdx]?.question}</h3>
                                 </div>
 
                                 <div className="space-y-4">
@@ -118,11 +118,11 @@ const Challenge = () => {
                                                 onClick={() => handleAnswer(idx)}
                                                 disabled={selectedAnswer !== null}
                                             >
-                                                <div className="flex items-start gap-3 sm:gap-4 w-full">
+                                                <div className="flex items-start gap-3 sm:gap-4 w-full overflow-hidden">
                                                     <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${selectedAnswer !== null && isCorrect ? 'border-green-600 text-green-700 bg-green-200' : selectedAnswer !== null && isSelected ? 'border-red-600 text-red-700 bg-red-200' : 'border-muted-foreground/30 text-muted-foreground'}`}>
                                                         {String.fromCharCode(65 + idx)}
                                                     </span>
-                                                    <span className="flex-1 font-medium text-left break-words leading-relaxed">{option}</span>
+                                                    <span className="flex-1 font-medium text-left break-words min-w-0 leading-relaxed" style={{wordBreak: \"break-word\", overflowWrap: \"anywhere\"}}>{option}</span>
                                                     {selectedAnswer !== null && isCorrect && <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 shrink-0" />}
                                                     {selectedAnswer !== null && isSelected && !isCorrect && <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 shrink-0" />}
                                                 </div>
@@ -131,16 +131,42 @@ const Challenge = () => {
                                     })}
                                 </div>
                                 {selectedAnswer !== null && (
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                                        animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
-                                        className="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-800"
-                                    >
-                                        <p className="font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
-                                            <InfoIcon className="w-4 h-4" /> Penjelasan
-                                        </p>
-                                        <p className="text-blue-700 dark:text-blue-200 leading-relaxed">{challengeQuestions[currentQuestionIdx]?.explanation}</p>
-                                    </motion.div>
+                                    <>
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                            animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
+                                            className="p-4 sm:p-6 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-800 overflow-hidden"
+                                        >
+                                            <p className="font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+                                                <InfoIcon className="w-4 h-4" /> Penjelasan
+                                            </p>
+                                            <p className="text-blue-700 dark:text-blue-200 leading-relaxed break-words">{challengeQuestions[currentQuestionIdx]?.explanation}</p>
+                                        </motion.div>
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.2 }}
+                                            className="mt-6 flex justify-end"
+                                        >
+                                            <Button
+                                                onClick={handleNext}
+                                                size="lg"
+                                                className="gap-2 shadow-lg"
+                                            >
+                                                {currentQuestionIdx < challengeQuestions.length - 1 ? (
+                                                    <>
+                                                        Pertanyaan Selanjutnya
+                                                        <ArrowRight className="w-5 h-5" />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Lihat Hasil
+                                                        <CheckCircle2 className="w-5 h-5" />
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </motion.div>
+                                    </>
                                 )}
                             </Card>
                         ) : (
@@ -196,3 +222,6 @@ const InfoIcon = ({ className }: { className?: string }) => (
 );
 
 export default Challenge;
+
+
+
