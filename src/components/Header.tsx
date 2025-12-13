@@ -67,16 +67,24 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
             </div>
 
             {/* Search Container & Language Toggle */}
-            <div className="flex-1 max-w-5xl relative flex items-center gap-4">
+            <div className="flex-1 max-w-5xl relative flex items-center gap-2 sm:gap-4 justify-end sm:justify-start">
 
-                {/* Search Bar - Wider */}
-                <div className="relative hidden sm:block w-full">
+                {/* Mobile Search Icon */}
+                <button
+                    onClick={() => setShowResults(true)}
+                    className="sm:hidden p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors"
+                >
+                    <Search className="w-5 h-5" />
+                </button>
+
+                {/* Search Bar - Desktop & Mobile Modal */}
+                <div className={`relative w-full ${showResults ? 'block' : 'hidden sm:block'}`}>
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <Input
                         placeholder="Search..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        onFocus={() => query && setShowResults(true)}
+                        onFocus={() => setShowResults(true)}
                         className="pl-11 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-dashboard-accent rounded-full h-11 shadow-sm w-full transition-all focus:bg-white/10"
                     />
                     {/* Search Dropdown */}
@@ -107,8 +115,8 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                     <button
                         onClick={() => setLanguage('id')}
                         className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${language === 'id'
-                                ? 'bg-dashboard-accent text-white shadow-sm'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            ? 'bg-dashboard-accent text-white shadow-sm'
+                            : 'text-slate-400 hover:text-white hover:bg-white/5'
                             }`}
                     >
                         ID
@@ -116,8 +124,8 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                     <button
                         onClick={() => setLanguage('en')}
                         className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${language === 'en'
-                                ? 'bg-dashboard-accent text-white shadow-sm'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            ? 'bg-dashboard-accent text-white shadow-sm'
+                            : 'text-slate-400 hover:text-white hover:bg-white/5'
                             }`}
                     >
                         EN
