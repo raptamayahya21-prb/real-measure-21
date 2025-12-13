@@ -197,7 +197,7 @@ const Measure = () => {
         <div className="flex flex-col h-[calc(100vh-120px)] bg-black rounded-3xl overflow-hidden border border-white/10 relative">
 
             {/* Disclaimer Area (Always Visible) */}
-            <div id="disclaimer-area" className="bg-[#333] p-3 text-center border-b border-white/10 z-50">
+            <div id="disclaimer-area" className="relative bg-[#333] p-3 text-center border-b border-white/10 z-10">
                 <p id="disclaimer-text" className="text-yellow-400 font-bold text-xs md:text-sm m-0">
                     DISCLAIMER: Pengukuran ini menggunakan Augmented Reality (WebAR) dan mungkin memiliki eror. Harap selalu periksa kembali hasil pengukuran dengan alat fisik.
                 </p>
