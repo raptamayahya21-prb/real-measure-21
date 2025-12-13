@@ -81,7 +81,7 @@ const Challenge = () => {
                         exit={{ opacity: 0, x: -20 }}
                     >
                         {!showResult ? (
-                            <Card className="p-4 sm:p-6 md:p-8 shadow-2xl border-white/20 overflow-hidden">
+                            <Card className="p-4 sm:p-6 md:p-8 shadow-2xl border-white/20 overflow-hidden max-w-full">
                                 <Button variant="ghost" onClick={() => setIsStarted(false)} className="mb-4 pl-0 hover:bg-transparent text-muted-foreground">
                                     <ArrowLeft className="w-4 h-4 mr-2" /> Keluar
                                 </Button>
@@ -96,7 +96,7 @@ const Challenge = () => {
                                     <h3 className="text-xl sm:text-2xl font-bold leading-relaxed break-words">{challengeQuestions[currentQuestionIdx]?.question}</h3>
                                 </div>
 
-                                <div className="space-y-4">
+                                <div className=\"space-y-4 max-w-full overflow-hidden\">
                                     {challengeQuestions[currentQuestionIdx]?.options.map((option, idx) => {
                                         const isCorrect = idx === challengeQuestions[currentQuestionIdx].correctAnswer;
                                         const isSelected = selectedAnswer === idx;
@@ -114,7 +114,7 @@ const Challenge = () => {
                                             <Button
                                                 key={idx}
                                                 variant="ghost"
-                                                className={btnClass}
+                                                className={`${btnClass} max-w-full`}
                                                 onClick={() => handleAnswer(idx)}
                                                 disabled={selectedAnswer !== null}
                                             >
@@ -222,6 +222,10 @@ const InfoIcon = ({ className }: { className?: string }) => (
 );
 
 export default Challenge;
+
+
+
+
 
 
 
