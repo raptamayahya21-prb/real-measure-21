@@ -81,7 +81,7 @@ const Challenge = () => {
                         exit={{ opacity: 0, x: -20 }}
                     >
                         {!showResult ? (
-                            <Card className="p-8 shadow-2xl border-white/20">
+                            <Card className="p-4 sm:p-6 md:p-8 shadow-2xl border-white/20">
                                 <Button variant="ghost" onClick={() => setIsStarted(false)} className="mb-4 pl-0 hover:bg-transparent text-muted-foreground">
                                     <ArrowLeft className="w-4 h-4 mr-2" /> Keluar
                                 </Button>
@@ -100,7 +100,7 @@ const Challenge = () => {
                                     {challengeQuestions[currentQuestionIdx]?.options.map((option, idx) => {
                                         const isCorrect = idx === challengeQuestions[currentQuestionIdx].correctAnswer;
                                         const isSelected = selectedAnswer === idx;
-                                        let btnClass = "w-full justify-start text-left p-6 h-auto text-lg transition-all duration-200 border-2";
+                                        let btnClass = "w-full justify-start text-left p-4 sm:p-6 h-auto text-base sm:text-lg transition-all duration-200 border-2";
 
                                         if (selectedAnswer !== null) {
                                             if (isCorrect) btnClass += " bg-green-50 text-green-900 border-green-500 shadow-md";
@@ -118,13 +118,13 @@ const Challenge = () => {
                                                 onClick={() => handleAnswer(idx)}
                                                 disabled={selectedAnswer !== null}
                                             >
-                                                <div className="flex items-center gap-4 w-full">
-                                                    <span className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${selectedAnswer !== null && isCorrect ? 'border-green-600 text-green-700 bg-green-200' : selectedAnswer !== null && isSelected ? 'border-red-600 text-red-700 bg-red-200' : 'border-muted-foreground/30 text-muted-foreground'}`}>
+                                                <div className="flex items-start gap-3 sm:gap-4 w-full">
+                                                    <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${selectedAnswer !== null && isCorrect ? 'border-green-600 text-green-700 bg-green-200' : selectedAnswer !== null && isSelected ? 'border-red-600 text-red-700 bg-red-200' : 'border-muted-foreground/30 text-muted-foreground'}`}>
                                                         {String.fromCharCode(65 + idx)}
                                                     </span>
-                                                    <span className="flex-1 font-medium">{option}</span>
-                                                    {selectedAnswer !== null && isCorrect && <CheckCircle2 className="w-6 h-6 text-green-600" />}
-                                                    {selectedAnswer !== null && isSelected && !isCorrect && <XCircle className="w-6 h-6 text-red-600" />}
+                                                    <span className="flex-1 font-medium text-left break-words leading-relaxed">{option}</span>
+                                                    {selectedAnswer !== null && isCorrect && <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 shrink-0" />}
+                                                    {selectedAnswer !== null && isSelected && !isCorrect && <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 shrink-0" />}
                                                 </div>
                                             </Button>
                                         );
