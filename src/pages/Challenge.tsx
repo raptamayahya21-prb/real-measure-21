@@ -100,12 +100,12 @@ const Challenge = () => {
                                     {challengeQuestions[currentQuestionIdx]?.options.map((option, idx) => {
                                         const isCorrect = idx === challengeQuestions[currentQuestionIdx].correctAnswer;
                                         const isSelected = selectedAnswer === idx;
-                                        let btnClass = "w-full justify-start text-left p-4 sm:p-6 h-auto text-base sm:text-lg transition-all duration-200 border-2";
+                                        let btnClass = "w-full max-w-full overflow-hidden justify-start text-left p-4 sm:p-6 h-auto text-base sm:text-lg transition-all duration-200 border-2";
 
                                         if (selectedAnswer !== null) {
                                             if (isCorrect) btnClass += " bg-green-50 text-green-900 border-green-500 shadow-md";
                                             else if (isSelected) btnClass += " bg-red-50 text-red-900 border-red-500 shadow-md";
-                                            else btnClass += " opacity-50 border-transparent bg-secondary/50";
+                                            else btnClass += " opacity-100 border-transparent bg-secondary/50";
                                         } else {
                                             btnClass += " hover:bg-secondary/80 hover:border-primary/50 border-transparent bg-secondary/30";
                                         }
@@ -118,11 +118,11 @@ const Challenge = () => {
                                                 onClick={() => handleAnswer(idx)}
                                                 disabled={selectedAnswer !== null}
                                             >
-                                                <div className="flex items-start gap-3 sm:gap-4 w-full overflow-hidden">
+                                                <div className="flex items-start gap-2 sm:gap-3 w-full overflow-hidden">
                                                     <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${selectedAnswer !== null && isCorrect ? 'border-green-600 text-green-700 bg-green-200' : selectedAnswer !== null && isSelected ? 'border-red-600 text-red-700 bg-red-200' : 'border-muted-foreground/30 text-muted-foreground'}`}>
                                                         {String.fromCharCode(65 + idx)}
                                                     </span>
-                                                    <span className="flex-1 font-medium text-left break-words min-w-0 leading-relaxed" style={{wordBreak: \"break-word\", overflowWrap: \"anywhere\"}}>{option}</span>
+                                                    <span className="flex-1 font-medium text-left whitespace-normal break-words min-w-0 leading-relaxed" style={{wordBreak: 'break-word', overflowWrap: 'anywhere'}}>{option}</span>
                                                     {selectedAnswer !== null && isCorrect && <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 shrink-0" />}
                                                     {selectedAnswer !== null && isSelected && !isCorrect && <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 shrink-0" />}
                                                 </div>
@@ -222,6 +222,14 @@ const InfoIcon = ({ className }: { className?: string }) => (
 );
 
 export default Challenge;
+
+
+
+
+
+
+
+
 
 
 
