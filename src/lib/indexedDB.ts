@@ -11,6 +11,7 @@ export interface MeasurementData {
     };
     timestamp?: string;
     id?: number; // ID from IndexedDB
+    user_email?: string; // Email user yang melakukan pengukuran
 }
 
 const DB_NAME = 'RealMeasureDB';

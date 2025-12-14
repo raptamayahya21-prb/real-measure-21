@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { RefreshCw, Save, Ruler, CheckCircle, Camera } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Input } from '@/components/ui/input';
 import { Card } from "@/components/ui/card";
@@ -16,6 +17,7 @@ type AppState = 'checking-permissions' | 'permission-denied' | 'ready-to-start' 
 
 const Measure = () => {
     const { t } = useLanguage();
+    const { user } = useAuth();
 
     // State
     const [appState, setAppState] = useState<AppState>('checking-permissions');
@@ -169,7 +171,8 @@ const Measure = () => {
                 real_value: real,
                 error_percentage: error,
                 scale_factor: scaleFactor || 0,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                user_email: user?.email || undefined
             });
 
             toast.success("Data tersimpan di Riwayat (Offline)!");

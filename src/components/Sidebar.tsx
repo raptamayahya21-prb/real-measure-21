@@ -4,9 +4,20 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Ruler, BookOpen, Trophy, History, Settings, Menu, X, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/context/LanguageContext';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (open: boolean) => void }) => {
     const { t, language } = useLanguage();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        if (confirm("Apakah Anda yakin ingin keluar?")) {
+            await logout();
+            navigate('/login');
+        }
+    };
 
     const navItems = [
         { path: '/', label: 'nav.home', icon: LayoutDashboard }, // Beranda
@@ -67,7 +78,13 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (open: boo
                 </nav>
 
                 <div className="p-4 border-t border-slate-100">
-                    {/* Optional footer content */}
+                    <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-3 px-4 py-3 rounded-full text-red-500 hover:bg-red-50 transition-all duration-200 group mx-2"
+                    >
+                        <LogOut className="w-5 h-5" />
+                        <span className="font-medium">Keluar</span>
+                    </button>
                 </div>
             </aside>
         </>

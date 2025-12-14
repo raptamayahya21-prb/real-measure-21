@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { format } from 'date-fns';
 import { id, enUS } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import { Calendar, Ruler, Trash2 } from 'lucide-react';
+import { Calendar, Ruler, Trash2, User } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -95,19 +95,25 @@ const History = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                                    {item.error_percentage !== undefined && (
-                                        <div className={`
+                                <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                                    <div className="flex flex-col items-end gap-1">
+                                        <div className="flex items-center gap-2 text-xs text-dashboard-text-muted">
+                                            <User className="w-3 h-3" />
+                                            {item.user_email || "Unknown User"}
+                                        </div>
+                                        {item.error_percentage !== undefined && (
+                                            <div className={`
                                             px-3 py-1 rounded-full text-xs font-bold font-mono border
                                             ${item.error_percentage < 5
-                                                ? 'bg-green-100 text-green-700 border-green-200'
-                                                : item.error_percentage < 15
-                                                    ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
-                                                    : 'bg-red-100 text-red-700 border-red-200'}
+                                                    ? 'bg-green-100 text-green-700 border-green-200'
+                                                    : item.error_percentage < 15
+                                                        ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                                                        : 'bg-red-100 text-red-700 border-red-200'}
                                         `}>
-                                            Error: {item.error_percentage.toFixed(2)}%
-                                        </div>
-                                    )}
+                                                Error: {item.error_percentage.toFixed(2)}%
+                                            </div>
+                                        )}
+                                    </div>
                                     <Button
                                         variant="ghost"
                                         size="icon"

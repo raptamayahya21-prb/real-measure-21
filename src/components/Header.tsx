@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Menu, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -27,6 +27,7 @@ const SEARCH_ITEMS = [
 
 const Header = ({ toggleSidebar }: HeaderProps) => {
     const { language, setLanguage } = useLanguage();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<typeof SEARCH_ITEMS>([]);
@@ -78,7 +79,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                 </button>
 
                 {/* Search Bar - Desktop & Mobile Modal */}
-                <div className={`relative w-full ${showResults ? 'block' : 'hidden sm:block'}`}>
+                <div className={`relative w-full ${showResults ? 'block z-50' : 'hidden sm:block'}`}>
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <Input
                         placeholder="Search..."
@@ -110,26 +111,34 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                     )}
                 </div>
 
-                {/* Language Toggle (ID/EN) */}
-                <div className="flex items-center bg-white/5 rounded-full p-1 border border-white/10 shrink-0">
-                    <button
-                        onClick={() => setLanguage('id')}
-                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${language === 'id'
-                            ? 'bg-dashboard-accent text-white shadow-sm'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5'
-                            }`}
-                    >
-                        ID
-                    </button>
-                    <button
-                        onClick={() => setLanguage('en')}
-                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${language === 'en'
-                            ? 'bg-dashboard-accent text-white shadow-sm'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5'
-                            }`}
-                    >
-                        EN
-                    </button>
+                {/* User Email & Language Toggle */}
+                <div className="flex items-center gap-3 shrink-0">
+                    {user && user.email && (
+                        <span className="hidden md:block text-sm font-medium text-dashboard-text max-w-[150px] truncate" title={user.email}>
+                            Hi! {user.email}
+                        </span>
+                    )}
+
+                    <div className="flex items-center bg-white/5 rounded-full p-1 border border-white/10">
+                        <button
+                            onClick={() => setLanguage('id')}
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${language === 'id'
+                                ? 'bg-dashboard-accent text-white shadow-sm'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            ID
+                        </button>
+                        <button
+                            onClick={() => setLanguage('en')}
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${language === 'en'
+                                ? 'bg-dashboard-accent text-white shadow-sm'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            EN
+                        </button>
+                    </div>
                 </div>
 
                 {/* Backdrop to close search */}
