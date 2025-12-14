@@ -10,6 +10,7 @@ export interface MeasurementData {
         end?: any;
     };
     timestamp?: string;
+    id?: number; // ID from IndexedDB
 }
 
 const DB_NAME = 'RealMeasureDB';
@@ -78,6 +79,22 @@ export const getAllMeasurements = async (): Promise<any[]> => {
 
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject('Gagal mengambil data.');
+        });
+    } catch (error) {
+        return Promise.reject(error);
+    }
+};
+
+export const deleteMeasurement = async (id: number): Promise<void> => {
+    try {
+        const database = await openDatabase();
+        return new Promise((resolve, reject) => {
+            const transaction = database.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.delete(id);
+
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject('Gagal menghapus data.');
         });
     } catch (error) {
         return Promise.reject(error);

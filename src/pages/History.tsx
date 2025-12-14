@@ -1,16 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { getAllMeasurements, MeasurementData } from '../lib/indexedDB';
+import { getAllMeasurements, deleteMeasurement, MeasurementData } from '../lib/indexedDB';
 import { useLanguage } from '../context/LanguageContext';
 import { Card } from "@/components/ui/card";
 import { format } from 'date-fns';
 import { id, enUS } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import { Calendar, Ruler } from 'lucide-react';
+import { Calendar, Ruler, Trash2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const History = () => {
     const { t, language } = useLanguage();
     const [measurements, setMeasurements] = useState<MeasurementData[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const handleDelete = async (id: number) => {
+        if (!confirm("Hapus data ini?")) return;
+        try {
+            await deleteMeasurement(id);
+            setMeasurements(prev => prev.filter(m => m.id !== id));
+            toast.success("Data berhasil dihapus");
+        } catch (error) {
+            console.error(error);
+            toast.error("Gagal menghapus data");
+        }
+    };
 
     const fetchHistory = async () => {
         try {
@@ -94,12 +108,21 @@ const History = () => {
                                             Error: {item.error_percentage.toFixed(2)}%
                                         </div>
                                     )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-red-500 hover:bg-red-50 hover:text-red-600 rounded-full"
+                                        onClick={() => handleDelete(item.id!)}
+                                    >
+                                        <Trash2 className="w-5 h-5" />
+                                    </Button>
                                 </div>
                             </Card>
                         </motion.div>
                     ))}
                 </div>
-            )}
+            )
+            }
         </div>
     );
 };
