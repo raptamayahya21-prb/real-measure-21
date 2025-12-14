@@ -3,8 +3,12 @@ import { Camera, X, Settings, Check, Trash2, AlertTriangle, ChevronDown, Chevron
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useLanguage } from '../../context/LanguageContext';
+import { saveMeasurement } from '../../lib/indexedDB';
 
 interface Point {
     x: number;
@@ -20,6 +24,11 @@ const StandardCamera = ({ onClose }: { onClose: () => void }) => {
     const [activeTab, setActiveTab] = useState<'measure' | 'calibrate'>('measure');
     const [referenceObject, setReferenceObject] = useState<string>('credit_card'); // credit_card = 8.56cm
     const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Save State
+    const [isSaveOpen, setIsSaveOpen] = useState(false);
+    const [itemName, setItemName] = useState('');
+    const [realValueInput, setRealValueInput] = useState('');
 
     // Initialize Camera
     useEffect(() => {
@@ -76,6 +85,41 @@ const StandardCamera = ({ onClose }: { onClose: () => void }) => {
     const getDistancePx = () => {
         if (points.length < 2) return "0";
         return calculateDistance(points[0], points[1]).toFixed(0);
+    };
+
+    const handleSave = async () => {
+        const measured = parseFloat(getDistanceCM());
+        if (measured <= 0) {
+            toast.error("Tidak ada data pengukuran valid.");
+            return;
+        }
+
+        const real = parseFloat(realValueInput);
+        let errorPercentage = 0;
+
+        if (!isNaN(real) && real > 0) {
+            errorPercentage = Math.abs((measured - real) / real) * 100;
+        }
+
+        try {
+            await saveMeasurement({
+                item_name: itemName || "Benda Tanpa Nama",
+                measured_value: measured,
+                unit: 'cm',
+                real_value: !isNaN(real) ? real : undefined,
+                error_percentage: errorPercentage,
+                timestamp: new Date().toISOString()
+            });
+
+            toast.success("Data berhasil disimpan ke Riwayat!");
+            setIsSaveOpen(false);
+            setItemName('');
+            setRealValueInput('');
+            clearPoints(); // Optional: Clear after save
+        } catch (error) {
+            console.error(error);
+            toast.error("Gagal menyimpan data.");
+        }
     };
 
     return (
@@ -232,7 +276,17 @@ const StandardCamera = ({ onClose }: { onClose: () => void }) => {
                                             <Trash2 className="w-5 h-5 text-red-500" />
                                         </Button>
                                     )}
-                                    <Button size="lg" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-xl shadow-blue-500/25 shadow-lg">
+                                    <Button size="lg"
+                                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-xl shadow-blue-500/25 shadow-lg"
+                                        onClick={() => {
+                                            if (points.length === 2) {
+                                                setIsSaveOpen(true);
+                                            } else {
+                                                // Trigger logic to start if needed, but tap handles it
+                                                toast.info("Tap layar untuk mulai mengukur");
+                                            }
+                                        }}
+                                    >
                                         {points.length === 2 ? "Simpan Ukuran" : "Mulai Ukur"}
                                     </Button>
                                 </div>
@@ -289,6 +343,59 @@ const StandardCamera = ({ onClose }: { onClose: () => void }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Save Dialog */}
+            <Dialog open={isSaveOpen} onOpenChange={setIsSaveOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Simpan Hasil Pengukuran</DialogTitle>
+                        <DialogDescription>
+                            Masukkan detail benda untuk disimpan ke riwayat.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="name" className="text-right">
+                                Nama Benda
+                            </Label>
+                            <Input
+                                id="name"
+                                value={itemName}
+                                onChange={(e) => setItemName(e.target.value)}
+                                placeholder="Contoh: Meja Belajar"
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="measured" className="text-right">
+                                Hasil Ukur
+                            </Label>
+                            <div className="col-span-3 font-mono font-bold text-lg">
+                                {getDistanceCM()} cm
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="real" className="text-right">
+                                Nilai Asli (Opsional)
+                            </Label>
+                            <Input
+                                id="real"
+                                type="number"
+                                value={realValueInput}
+                                onChange={(e) => setRealValueInput(e.target.value)}
+                                placeholder="Untuk hitung error %"
+                                className="col-span-3"
+                            />
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setIsSaveOpen(false)}>Batal</Button>
+                        <Button onClick={handleSave} className="bg-blue-600 text-white">Simpan</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
