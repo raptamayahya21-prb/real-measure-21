@@ -96,7 +96,7 @@ const Challenge = () => {
                                     <h3 className="text-xl sm:text-2xl font-bold leading-relaxed break-words">{challengeQuestions[currentQuestionIdx]?.question}</h3>
                                 </div>
 
-                                <div className=\"space-y-4 max-w-full overflow-hidden\">
+                                <div className="space-y-4 max-w-full overflow-hidden">
                                     {challengeQuestions[currentQuestionIdx]?.options.map((option, idx) => {
                                         const isCorrect = idx === challengeQuestions[currentQuestionIdx].correctAnswer;
                                         const isSelected = selectedAnswer === idx;
@@ -122,7 +122,7 @@ const Challenge = () => {
                                                     <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${selectedAnswer !== null && isCorrect ? 'border-green-600 text-green-700 bg-green-200' : selectedAnswer !== null && isSelected ? 'border-red-600 text-red-700 bg-red-200' : 'border-muted-foreground/30 text-muted-foreground'}`}>
                                                         {String.fromCharCode(65 + idx)}
                                                     </span>
-                                                    <span className="flex-1 font-medium text-left whitespace-normal break-words min-w-0 leading-relaxed" style={{wordBreak: 'break-word', overflowWrap: 'anywhere'}}>{option}</span>
+                                                    <span className="flex-1 font-medium text-left whitespace-normal break-words min-w-0 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{option}</span>
                                                     {selectedAnswer !== null && isCorrect && <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 shrink-0" />}
                                                     {selectedAnswer !== null && isSelected && !isCorrect && <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 shrink-0" />}
                                                 </div>

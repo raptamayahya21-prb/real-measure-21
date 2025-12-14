@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import ARScene from '../components/ARScene';
 import { calculateScaleFactor, applyScaleFactor } from '../logic/measurement';
 import { saveMeasurement } from '../lib/indexedDB'; // Import local DB service
+import StandardCamera from '../components/measurement/StandardCamera';
 
 type AppState = 'checking-permissions' | 'permission-denied' | 'ready-to-start' | 'idle' | 'calibrating-a' | 'calibrating-b' | 'measuring-start' | 'measuring-end' | 'result';
 
@@ -18,7 +19,9 @@ const Measure = () => {
 
     // State
     const [appState, setAppState] = useState<AppState>('checking-permissions');
-    const [scaleFactor, setScaleFactor] = useState<number | null>(null);
+    // DEFAULT SCALE FACTOR: 100 (1 Meter WebXR = 100 cm Real)
+    // Assuming the device tracks in meters, which is standard for WebXR.
+    const [scaleFactor, setScaleFactor] = useState<number | null>(100);
     const [calibrationDistRaw, setCalibrationDistRaw] = useState<number | null>(null);
     const [realRefDistance, setRealRefDistance] = useState<string>('8.56');
 
@@ -30,22 +33,10 @@ const Measure = () => {
     const [isSaving, setIsSaving] = useState(false);
 
     // 1. Check WebXR Support
+    // 1. Check WebXR Support (Simplified: Just default to ready, but prefer StandardCamera for universal access)
+    // We are overriding the complex logic to use StandardCamera
     useEffect(() => {
-        if ('xr' in navigator) {
-            // @ts-ignore
-            navigator.xr.isSessionSupported('immersive-ar').then((supported: boolean) => {
-                if (supported) {
-                    setInstruction("WebXR Support Terdeteksi. Siap Meluncurkan AR.");
-                    setAppState('ready-to-start');
-                } else {
-                    setInstruction("Perangkat tidak mendukung WebAR (ARCore/ARKit).");
-                    setAppState('permission-denied');
-                }
-            });
-        } else {
-            setInstruction("Browser tidak mendukung WebXR.");
-            setAppState('permission-denied');
-        }
+        setAppState('ready-to-start');
     }, []);
 
     // Event Listeners for AR Components
@@ -133,12 +124,12 @@ const Measure = () => {
 
     const startMeasuring = () => {
         if (!scaleFactor) {
-            toast.error("Lakukan Kalibrasi Terlebih Dahulu!");
-            return;
+            // Should not happen with default 100, but safety check
+            setScaleFactor(100);
         }
         setAppState('measuring-start');
         // UPDATE: Specific instruction request
-        setInstruction("Tap Titik 1 (Awal)");
+        setInstruction("Tap Titik Awal (Start)");
         setFinalResult(null);
         setMeasuredRaw(null);
     };
@@ -152,9 +143,9 @@ const Measure = () => {
 
     const reCalibrate = () => {
         setAppState('idle');
-        setScaleFactor(null);
+        // setScaleFactor(null); // Keep default scale
         setCalibrationDistRaw(null);
-        setInstruction("Siapkan objek referensi.");
+        setInstruction("Siap Mengukur.");
         setFinalResult(null);
         setMeasuredRaw(null);
     };
@@ -193,13 +184,28 @@ const Measure = () => {
 
     const isARActive = !['checking-permissions', 'permission-denied', 'ready-to-start'].includes(appState);
 
+    // Standard Camera Mode (Force Enable for Universal Access)
+    const [showStandardCamera, setShowStandardCamera] = useState(false);
+
+    const startStandardCamera = () => {
+        setShowStandardCamera(true);
+    }
+
+    if (showStandardCamera) {
+        return (
+            <div className="flex flex-col h-[calc(100vh-120px)] bg-black rounded-3xl overflow-hidden border border-white/10 relative">
+                <StandardCamera onClose={() => setShowStandardCamera(false)} />
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col h-[calc(100vh-120px)] bg-black rounded-3xl overflow-hidden border border-white/10 relative">
 
             {/* Disclaimer Area (Always Visible) */}
             <div id="disclaimer-area" className="relative bg-[#333] p-3 text-center border-b border-white/10 z-10">
                 <p id="disclaimer-text" className="text-yellow-400 font-bold text-xs md:text-sm m-0">
-                    DISCLAIMER: Pengukuran ini menggunakan Augmented Reality (WebAR) dan mungkin memiliki eror. Harap selalu periksa kembali hasil pengukuran dengan alat fisik.
+                    DISCLAIMER: Pengukuran ini menggunakan pendekatan visual (2D/3D). Harap selalu periksa kembali hasil pengukuran dengan alat fisik.
                 </p>
             </div>
 
@@ -216,34 +222,26 @@ const Measure = () => {
                 {/* Pre-AR UI (Start Button) */}
                 {!isARActive && (
                     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 text-center bg-slate-900">
-                        {appState === 'checking-permissions' && (
-                            <div className="animate-pulse text-white">Memeriksa Kompatibilitas AR...</div>
-                        )}
-
-                        {appState === 'permission-denied' && (
-                            <div className="text-red-400 max-w-md">
-                                <h3 className="font-bold text-lg mb-2">WebXR Tidak Didukung</h3>
-                                <p className="text-sm">Gunakan Chrome di Android atau WebXR Viewer di iOS.</p>
+                        <div className="max-w-md space-y-6">
+                            <div className="p-6 bg-slate-800 rounded-full inline-block mb-4">
+                                <Camera className="w-12 h-12 text-dashboard-accent" />
                             </div>
-                        )}
-
-                        {appState === 'ready-to-start' && (
-                            <div className="max-w-md space-y-6">
-                                <div className="p-6 bg-slate-800 rounded-full inline-block mb-4">
-                                    <Camera className="w-12 h-12 text-dashboard-accent" />
-                                </div>
-                                <div>
-                                    <h2 className="text-2xl font-bold text-white mb-2">Siap Mengukur</h2>
-                                    <p className="text-slate-400">Pastikan ruangan cukup terang dan tekstur permukaan terlihat jelas.</p>
-                                </div>
-                                <Button
-                                    onClick={startARSession}
-                                    className="w-full h-14 text-lg font-bold bg-dashboard-accent hover:bg-dashboard-accent/90 text-white rounded-xl shadow-lg shadow-dashboard-accent/20"
-                                >
-                                    Mulai Kamera AR
-                                </Button>
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-2">Siap Mengukur</h2>
+                                <p className="text-slate-400">Gunakan kamera untuk mengukur jarak antar titik.</p>
                             </div>
-                        )}
+
+                            <Button
+                                onClick={startStandardCamera}
+                                className="w-full h-14 text-lg font-bold bg-dashboard-accent hover:bg-dashboard-accent/90 text-white rounded-xl shadow-lg shadow-dashboard-accent/20"
+                            >
+                                Mulai Kamera
+                            </Button>
+
+                            <p className="text-xs text-slate-500 mt-4">
+                                * Mendukung Semua Perangkat (Android/iOS/PC)
+                            </p>
+                        </div>
                     </div>
                 )}
 
@@ -252,8 +250,8 @@ const Measure = () => {
                     <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between p-6">
                         {/* Status Strip */}
                         <div className="flex justify-between items-start">
-                            <div className={`px-4 py-2 rounded-full backdrop-blur-md border ${scaleFactor ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-yellow-500/20 border-yellow-500 text-yellow-400'} text-xs font-mono font-bold shadow-lg pointer-events-auto`}>
-                                {scaleFactor ? `S: ${scaleFactor.toFixed(2)}` : 'BELUM KALIBRASI'}
+                            <div className={`px-4 py-2 rounded-full backdrop-blur-md border border-green-500/50 bg-green-500/20 text-green-400 text-xs font-mono font-bold shadow-lg pointer-events-auto`}>
+                                {scaleFactor ? `Mode: Auto Scale (1m=100cm)` : 'System Ready'}
                             </div>
                             {/* Cancel Button Small */}
                             {(['calibrating-a', 'calibrating-b', 'measuring-start'].includes(appState)) && (
@@ -318,14 +316,9 @@ const Measure = () => {
                             {/* Main Action Buttons */}
                             {appState === 'idle' && (
                                 <div className="grid grid-cols-2 gap-3">
-                                    <Button onClick={startCalibration} className="col-span-2 bg-dashboard-accent text-white h-12 rounded-xl text-lg font-bold shadow-lg shadow-dashboard-accent/20">
-                                        {scaleFactor ? 'Kalibrasi Ulang' : 'Mulai Kalibrasi'}
+                                    <Button onClick={startMeasuring} className="col-span-2 bg-dashboard-accent text-white h-12 rounded-xl text-lg font-bold shadow-lg shadow-dashboard-accent/20">
+                                        Mulai Ukur
                                     </Button>
-                                    {scaleFactor && (
-                                        <Button onClick={startMeasuring} className="col-span-2 bg-emerald-500 hover:bg-emerald-600 text-white h-12 rounded-xl text-lg font-bold shadow-lg shadow-emerald-500/20">
-                                            Mulai Ukur
-                                        </Button>
-                                    )}
                                 </div>
                             )}
                         </div>
@@ -334,7 +327,7 @@ const Measure = () => {
             </div>
 
             <div className="absolute top-4 right-4 pointer-events-none z-20 opacity-50 text-[10px] text-white">
-                Ver: 1.2 (Strict WebXR Only)
+                Ver: 2.0 (Universal)
             </div>
         </div>
     );
